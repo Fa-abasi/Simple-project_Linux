@@ -1,0 +1,150 @@
+#!/bin/bash
+
+counter=1
+while [ $counter -eq 1 ] 
+do
+studenti=1
+scorei=1
+reporti=1
+dialog --backtitle "Linux Shell Script Tutorial " --title "Main Menu" --menu "Move using [UP] [DOWN],[Enter] to \
+Select" 15 50 3 \
+STUDENT_REGISTRATION "Enter Name , Family , Id" \
+ENTER_SCORES "Enter Course Grades" \
+REPORTING "View Report" \
+EXIT "exit" 2>/tmp/menuitem.$$
+menuitem=`cat /tmp/menuitem.$$`
+opt=$?
+case $menuitem in
+STUDENT_REGISTRATION) ans=2;;
+ENTER_SCORES) ans=3;;
+REPORTING) ans=4;;
+EXIT)ans=1;;
+esac
+####
+case $ans in
+	   1) counter=0;;
+           2) 
+	while [ $studenti -eq 1 ]
+	do
+		
+	dialog --title "Inputbox - To take input from you" --backtitle "Linux Shell\ Script Tutorial" --inputbox "Enter Student's Information : Id  Name  Family" 8 60 2>/tmp/input.$$
+	sel0=$?
+	information=`cat /tmp/input.$$`	
+	 
+	if [ $sel0 -eq 0 ]
+	then
+	  	echo $information>>STUDENT
+	  	rm -f /tmp/input.$$
+		  dialog --title "Alert" --backtitle "Linux Shell Script\ 
+		Tutorial" --yesno "\nDo you want to continue? " 7 60
+		sel1=$?
+		case $sel1 in
+			0) studenti=1;;
+			1) studenti=0;;
+			255) studenti=0
+			counter=0
+			;;
+			
+	 	esac
+	  elif [ $sel0 -eq 1 ]
+	  then
+	  	studenti=0
+	  	
+	 elif [ $sel0  -eq 255 ]
+	 then
+	  counter=0 
+	 fi
+			
+	done
+	;;
+          3)
+	while [ $scorei -eq 1 ]
+	do
+	
+	
+	dialog --title "Inputbox - To take input from you" --backtitle "Linux Shell\ Script Tutorial" --inputbox "Enter This Information : Id  OS-Score  OSlab-Score" 8 60 2>/tmp/input.$$
+	sel2=$?
+	informationscore=`cat /tmp/input.$$`	
+	if [ $sel2 -eq 0 ]
+	then
+	  	echo $informationscore >> Score
+	  	rm -f /tmp/input.$$
+		  dialog --title "Alert" --backtitle "Linux Shell Script\ 
+		Tutorial" --yesno "\nDo you want to continue? " 7 60
+		sel3=$?
+		case $sel3 in
+			0) scorei=1;;
+			1) scorei=0;;
+			255) scorei=0
+			counter=0
+			;;
+			
+	 	esac
+	  elif [ $sel2 -eq 1 ]
+	  then
+	  	scorei=0
+	  	
+	 elif [ $sel2 -eq 255 ]
+	 then
+	  counter=0 
+	 fi
+	
+	done 
+	;;
+          4) 
+	while [ $reporti -eq 1 ]
+	do
+	
+		dialog --backtitle "Linux Shell Script Tutorial " --title "Report Menu" --menu "Move using [UP] [DOWN],[Enter] to \
+	Select" 15 50 3 \
+	Report_OSLessons "OS Lesson Reporting" \
+	Report_OSlabLessons "OSlab Lesson Reporting" \
+	Report_Student "Student Reporting" \
+	Return "Back to Main Menu" 2>/tmp/menuitem.$$
+	sel3=`cat /tmp/menuitem.$$`
+	opt=$?
+	case $sel3 in
+	Report_OSLessons) r=3;;
+	Report_OSlabLessons) r=4;;
+	Report_Student) r=5;;
+	Return) r=1;;
+	esac
+	##
+		case $r in
+		1)
+		reporti=0
+		;;
+		3)
+		join STUDENT Score >/tmp/input.$$
+		cut -d " " -f 1,2,3,4  /tmp/input.$$ > Report
+		dialog --title "OS Lesson Reporting" --backtitle "Linux Shell Script\
+		Tutorial" --textbox Report 7 60
+		;;
+		4)
+		join STUDENT Score >/tmp/input.$$
+		cut -d " " -f 2,3,5 /tmp/input.$$ > Report
+		dialog --title "OSlab Lesson Reporting" --backtitle "Linux Shell Script\
+		Tutorial" --textbox Report 7 60
+		;;
+		5)
+		dialog --title "Inputbox - To take input from you" --backtitle "Linux Shell\ Script Tutorial" --inputbox "Enter Student Id" 8 60 2>/tmp/input.$$
+		sel4=$?
+		stid=`cat /tmp/input.$$`
+		if [ $sel4 -eq 0 ]
+	        then
+		join STUDENT Score > /tmp/input.$$
+		awk " /$stid/ "' {print $2" "$3" "$4" "$5} ' /tmp/input.$$ > Report
+		dialog --title "Student Reporting" --backtitle "Linux Shell Script\
+		Tutorial" --textbox Report 7 60
+		fi
+		;;
+		esac
+	
+	done  
+	;;
+         255)         
+	counter=0
+	;;
+esac
+done
+rm -f /tmp/input.$$
